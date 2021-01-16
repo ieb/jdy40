@@ -1,0 +1,24 @@
+{
+  "name": "Jdy40",
+  "version": "1.0.0",
+  "description": "Library to interface to a Jdy40 board over serial",
+  "keywords": "communications, serial, rf",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/ieb/jdy40.git"
+  },
+  "authors":
+  [
+    {
+      "name": "Ian Boston",
+      "email": "ieb",
+      "url": "https://github.com/ieb"
+    }
+  ],
+  "license": "MIT",
+  "dependencies": {
+  },
+  "frameworks": "*",
+  "platforms": "*"
+}

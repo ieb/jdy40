@@ -81,7 +81,7 @@ uint16_t Jdy40::crc_ccitt (const uint8_t * str, unsigned int length) {
 
 int16_t Jdy40::checkCRC(const char *inputLine) {
   uint16_t len = strlen(inputLine);
-  int lastComma = len;
+  uint16_t lastComma = len;
   if ( len == 0 ) {
     return -1;
   }

@@ -170,7 +170,7 @@ int Jdy40::expect(const char *cmd, const char *response) {
 }
 
 void Jdy40::dumpHex(const char * str) {
-  for (int i = 0; i<strlen(str); i++)
+  for (uint16_t i = 0; i<strlen(str); i++)
   {
     debugStream->print(str[i], HEX);//excludes NULL byte
   }

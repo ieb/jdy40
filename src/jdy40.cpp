@@ -8,7 +8,9 @@ Jdy40::Jdy40(int dataEnablePin, uint16_t _baud, Stream *_jdy40Stream, Stream *_d
     jdy40Stream = _jdy40Stream;
     debugStream = _debugStream;
     baud = _baud;
+    Serial.println("Enable PinMode");
     pinMode(dataEnPin, OUTPUT);
+    Serial.println("Done Enable PinMode");
 }
 
 

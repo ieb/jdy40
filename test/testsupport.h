@@ -54,6 +54,7 @@ class MockStreamLoader {
 
 void setupStream() {
 
+// FIX const __FlashStringHelper*
     When(OverloadedMethod(ArduinoFake(Stream), print, size_t(const char *))).AlwaysDo(
         [](const char * out)->int{ 
             std::cout << out;

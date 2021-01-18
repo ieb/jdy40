@@ -1,18 +1,18 @@
 #include "jdy40.h"
 
 
-const char OK[] PROGMEM = "OK";
-const char AT_SERIAL[] PROGMEM = "AT+CLSSA0";
-const char AT_TRANSMIT_POWER[] PROGMEM = "AT+POWE9";
-const char AT_BAUD_1200[] PROGMEM = "AT+BAUD1";
-const char AT_BAUD_2400[] PROGMEM = "AT+BAUD2";
-const char AT_BAUD_4800[] PROGMEM = "AT+BAUD3";
-const char AT_BAUD_9600[] PROGMEM = "AT+BAUD4";
-const char AT_BAUD_14400[] PROGMEM = "AT+BAUD5";
-const char AT_BAUD_19200[] PROGMEM = "AT+BAUD6";
-const char AT_RFID[] PROGMEM = "AT+RFID%u04";
-const char AT_DVID[] PROGMEM = "AT+DVID%u04";
-const char AT_RFC[] PROGMEM = "AT+RFC%u03";
+#define OK "OK"
+#define AT_SERIAL "AT+CLSSA0"
+#define AT_TRANSMIT_POWER "AT+POWE9"
+#define AT_BAUD_1200 "AT+BAUD1"
+#define AT_BAUD_2400 "AT+BAUD2"
+#define AT_BAUD_4800 "AT+BAUD3"
+#define AT_BAUD_9600 "AT+BAUD4"
+#define AT_BAUD_14400 "AT+BAUD5"
+#define AT_BAUD_19200 "AT+BAUD6"
+#define AT_RFID "AT+RFID%u04"
+#define AT_DVID "AT+DVID%u04"
+#define AT_RFC "AT+RFC%u03"
 
 Jdy40::Jdy40(int dataEnablePin) {
     dataEnPin = dataEnablePin;

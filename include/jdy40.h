@@ -3,12 +3,15 @@
 #define _WINDSENSOR_H
 
 #include <Arduino.h>
-#define READBUFFER_LEN 1024
 
 class Jdy40 {
 
     public:
-        Jdy40(int dataEnablePin=4, uint16_t _baud=9600, Stream *_jdy40Stream=&Serial, Stream *_debugStream=&Serial);
+        Jdy40(int dataEnablePin=4);
+        void begin(Stream *_jdy40Stream=&Serial, uint16_t _baud=9600);
+        void setDebug(Stream *_debugStream);
+        void setInputBuffer(char * inputBuffer, uint16_t maxLen);
+
         void startConfig();
         void endConfig();
         char *readLine();
@@ -29,11 +32,12 @@ class Jdy40 {
         void setupJDY40();
         Stream * debugStream;
         Stream * jdy40Stream;
-        int bufferPos;
-        int dataEnPin;
+        uint8_t dataEnPin;
         uint16_t baud;
         bool inConfig;
-        char inputLine[READBUFFER_LEN];
+        uint16_t bufferPos;
+        uint16_t maxLineLength;
+        char *inputLine;
 };
 
 #endif

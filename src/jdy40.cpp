@@ -2,15 +2,27 @@
 
 
 
-Jdy40::Jdy40(int dataEnablePin, uint16_t _baud, Stream *_jdy40Stream, Stream *_debugStream) {
+Jdy40::Jdy40(int dataEnablePin) {
     dataEnPin = dataEnablePin;
-    bufferPos = 0;
-    jdy40Stream = _jdy40Stream;
-    debugStream = _debugStream;
+    debugStream = NULL;
+    inputLine = NULL;
+    maxLineLength = 0;
+    baud = 0;
+}
+
+void Jdy40::begin(Stream *_jdy40Stream, uint16_t _baud) {
     baud = _baud;
-    Serial.println("Enable PinMode");
+    jdy40Stream = _jdy40Stream;
     pinMode(dataEnPin, OUTPUT);
-    Serial.println("Done Enable PinMode");
+}
+
+void Jdy40::setDebug(Stream *_debugStream) {
+    debugStream = _debugStream;
+}
+void Jdy40::setInputBuffer(char * inputBuffer, uint16_t maxLen) {
+  inputLine = inputBuffer;
+  maxLineLength = maxLen;
+  bufferPos = 0;
 }
 
 
@@ -121,7 +133,7 @@ char * Jdy40::readLine() {
   while(jdy40Stream->available() > 0) {
     char b = jdy40Stream->read();
 
-    if ( b == '\n') {
+    if ( maxLineLength && b == '\n') {
       inputLine[bufferPos] = '\0';
       int16_t crcPos = checkCRC(inputLine);
       if ( crcPos >= 0 ) {
@@ -129,13 +141,15 @@ char * Jdy40::readLine() {
         bufferPos = 0;
         return inputLine;
       } else {
-        debugStream->print("CRC Error, rejected");
-        debugStream->println(inputLine);
+        if (debugStream != NULL ) {
+          debugStream->print("CRC Error, rejected");
+          debugStream->println(inputLine);
+        }
         // drop the line CRC invalid.
         bufferPos = 0;
         return NULL;
       }
-    } else if ( bufferPos < READBUFFER_LEN-1 ) {
+    } else if ( bufferPos < maxLineLength-1 ) {
       inputLine[bufferPos] = b;
       bufferPos++;
     } else {
@@ -158,15 +172,19 @@ int Jdy40::expect(const char *cmd, const char *response) {
     String res = jdy40Stream->readStringUntil('\n');
     res.trim();
     if ( res.equals(response) ) {
-      debugStream->print(cmd);
-      debugStream->println(" OK");
+      if ( debugStream != NULL ) {
+        debugStream->print(cmd);
+        debugStream->println(" OK");
+      }
       return 1;    
     } 
-    debugStream->println("Init Failed command:");
-    debugStream->println(cmd);
-    debugStream->println(res);
-    dumpHex(res.c_str());
-    dumpHex(response);
+    if ( debugStream != NULL ) {
+      debugStream->println("Init Failed command:");
+      debugStream->println(cmd);
+      debugStream->println(res);
+      dumpHex(res.c_str());
+      dumpHex(response);
+    }
   }
   return 0;
 }

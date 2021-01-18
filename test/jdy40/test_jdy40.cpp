@@ -10,14 +10,18 @@ using namespace fakeit;
 Stream* output = ArduinoFakeMock(Stream);
 Stream* debug = ArduinoFakeMock(Stream);
 MockStreamLoader loader;
-Jdy40 *jdy;
+Jdy40 jdy(10);
+#define INPUT_BUFFER_LEN 1024
+char inputBuffer[INPUT_BUFFER_LEN];
 
 
 void setUp(void) {
     ArduinoFakeReset();
     setupStream();
     When(Method(ArduinoFake(), pinMode)).Return();
-    jdy = new Jdy40(10,9600, output, debug);
+    jdy.begin(output,9600);
+    jdy.setDebug(debug);
+    jdy.setInputBuffer(&inputBuffer[0],INPUT_BUFFER_LEN);
 
     Verify(Method(ArduinoFake(), pinMode).Using(10, OUTPUT)).Once();
 }
@@ -28,14 +32,14 @@ void test_check_fail_crc() {
 
 
 
-    TEST_ASSERT_EQUAL_INT16(-1, jdy->checkCRC(""));
-    TEST_ASSERT_EQUAL_INT16(-1, jdy->checkCRC("12312,12312,"));
-    TEST_ASSERT_EQUAL_INT16(-1, jdy->checkCRC("12312,12312,asaa"));
+    TEST_ASSERT_EQUAL_INT16(-1, jdy.checkCRC(""));
+    TEST_ASSERT_EQUAL_INT16(-1, jdy.checkCRC("12312,12312,"));
+    TEST_ASSERT_EQUAL_INT16(-1, jdy.checkCRC("12312,12312,asaa"));
 
 }
 
 void test_write() {
-    jdy->writeLine("testing,1,2,3");
+    jdy.writeLine("testing,1,2,3");
 
     Verify(OverloadedMethod(ArduinoFake(Stream), print, size_t(const char *)).Using("testing,1,2,3")).Once();
     Verify(OverloadedMethod(ArduinoFake(Stream), print, size_t(char)).Using(',')).Once();
@@ -48,7 +52,7 @@ void test_read() {
 //    When(Method(ArduinoFake(Serial), available)).AlwaysReturn(1);
 //    // output line and chcksum in hex 13080 == 0x3318
 //    When(Method(ArduinoFake(Serial), read)).Return('t','e','s','t','i','n','g',',','1',',','2',',','3',',','3','3','1','8','\n');
-    char * line = jdy->readLine();
+    char * line = jdy.readLine();
     TEST_ASSERT_NOT_NULL(line);
     TEST_ASSERT_EQUAL_STRING("testing,1,2,3", line);
 
@@ -58,7 +62,7 @@ void test_read() {
 void test_read_badchecksum() {
     // bad checksum
     loader.load("testing,1,2,3,3316\n");
-    char * line = jdy->readLine();
+    char * line = jdy.readLine();
     TEST_ASSERT_NULL(line);
 }
 
@@ -66,14 +70,14 @@ void test_read_badchecksum() {
 
 void test_read_emptyline() {
     loader.load("\n");
-    char * line = jdy->readLine();
+    char * line = jdy.readLine();
     TEST_ASSERT_NULL(line);
 }
 
 
 void test_read_comma() {
     loader.load(",");
-    char * line = jdy->readLine();
+    char * line = jdy.readLine();
     TEST_ASSERT_NULL(line);
 }
 

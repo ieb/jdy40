@@ -10,9 +10,9 @@
 #define AT_BAUD_9600 "AT+BAUD4"
 #define AT_BAUD_14400 "AT+BAUD5"
 #define AT_BAUD_19200 "AT+BAUD6"
-#define AT_RFID "AT+RFID%u04"
-#define AT_DVID "AT+DVID%u04"
-#define AT_RFC "AT+RFC%u03"
+#define AT_RFID "AT+RFID%04u"
+#define AT_DVID "AT+DVID%04u"
+#define AT_RFC "AT+RFC%03u"
 
 Jdy40::Jdy40(int dataEnablePin) {
     dataEnPin = dataEnablePin;
@@ -79,7 +79,6 @@ void Jdy40::setBaud(uint16_t baud) {
    }
 }
 
-
 void Jdy40::setRFID(uint16_t  rfid) {
   char buffer[13];
   sprintf(buffer,AT_RFID, rfid);
@@ -98,6 +97,7 @@ void Jdy40::setChannel(uint16_t chan) {
   startConfig();
   send(buffer); // Wireless ID set to 1020
 }
+
 
 uint16_t Jdy40::crc_ccitt (const uint8_t * str, unsigned int length) {
   uint16_t crc = 0;
@@ -180,6 +180,9 @@ char * Jdy40::readLine() {
 
 
 int Jdy40::send(const char *cmd) {
+  if ( debugStream != NULL ) {
+    debugStream->print(cmd);
+  }
   for(int i = 0; i < 4; i++) {
     delay(500);
     while(jdy40Stream->available()) {
@@ -192,18 +195,13 @@ int Jdy40::send(const char *cmd) {
     res.trim();
     if ( res.equals(OK) ) {
       if ( debugStream != NULL ) {
-        debugStream->print(cmd);
         debugStream->println(F(" OK"));
       }
       return 1;    
     } 
-    if ( debugStream != NULL ) {
-      debugStream->println(F("Init Failed command:"));
-      debugStream->println(cmd);
-      debugStream->println(res);
-      dumpHex(res.c_str());
-      dumpHex(OK);
-    }
+  }
+  if ( debugStream != NULL ) {
+    debugStream->println(F(" Failed"));
   }
   return 0;
 }

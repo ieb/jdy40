@@ -20,7 +20,7 @@ void setUp(void) {
     setupStream();
     When(Method(ArduinoFake(), pinMode)).Return();
     jdy.begin(output,9600);
-    jdy.setDebug(debug);
+    // jdy.setDebug(debug);
     jdy.setInputBuffer(&inputBuffer[0],INPUT_BUFFER_LEN);
 
     Verify(Method(ArduinoFake(), pinMode).Using(10, OUTPUT)).Once();

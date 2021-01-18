@@ -1,6 +1,18 @@
 #include "jdy40.h"
 
 
+const char OK[] PROGMEM = "OK";
+const char AT_SERIAL[] PROGMEM = "AT+CLSSA0";
+const char AT_TRANSMIT_POWER[] PROGMEM = "AT+POWE9";
+const char AT_BAUD_1200[] PROGMEM = "AT+BAUD1";
+const char AT_BAUD_2400[] PROGMEM = "AT+BAUD2";
+const char AT_BAUD_4800[] PROGMEM = "AT+BAUD3";
+const char AT_BAUD_9600[] PROGMEM = "AT+BAUD4";
+const char AT_BAUD_14400[] PROGMEM = "AT+BAUD5";
+const char AT_BAUD_19200[] PROGMEM = "AT+BAUD6";
+const char AT_RFID[] PROGMEM = "AT+RFID%u04";
+const char AT_DVID[] PROGMEM = "AT+DVID%u04";
+const char AT_RFC[] PROGMEM = "AT+RFC%u03";
 
 Jdy40::Jdy40(int dataEnablePin) {
     dataEnPin = dataEnablePin;
@@ -44,40 +56,47 @@ void Jdy40::endConfig() {
   }
 }
 
+
 void Jdy40::init() {
   setBaud(baud);
-  expect("AT+CLSSA0","OK"); // Serial transmission.
-  expect("AT+POWE9","OK"); // Power 12db
+  send(AT_SERIAL); // Serial transmission.
+  send(AT_TRANSMIT_POWER); // Power 12db
 }
+
+
 
 
 void Jdy40::setBaud(uint16_t baud) {
    startConfig();
    switch(baud) {
-       case 1200: expect("AT+BAUD1","OK"); return;
-       case 2400: expect("AT+BAUD2","OK"); return;
-       case 4800: expect("AT+BAUD3","OK"); return;
-       case 9600: expect("AT+BAUD4","OK"); return;
-       case 14400: expect("AT+BAUD5","OK"); return;
-       case 19200: expect("AT+BAUD6","OK"); return;
-       default: expect("AT+BAUD4","OK"); return;
+       case 1200: send(AT_BAUD_1200); return;
+       case 2400: send(AT_BAUD_2400); return;
+       case 4800: send(AT_BAUD_4800); return;
+       case 9600: send(AT_BAUD_9600); return;
+       case 14400: send(AT_BAUD_14400); return;
+       case 19200: send(AT_BAUD_19200); return;
+       default: send(AT_BAUD_9600); return;
    }
 }
 
-void Jdy40::setRFID(const char*  rfid) {
-  String cmd = String("AT+RFID") + String(rfid);
+
+void Jdy40::setRFID(uint16_t  rfid) {
+  char buffer[13];
+  sprintf(buffer,AT_RFID, rfid);
   startConfig();
-  expect(cmd.c_str(),"OK"); // Wireless ID set to 1020
+  send(buffer); // Wireless ID set to 1020
 }
-void Jdy40::setDeviceID(const char* dvid) {
-  String cmd = String("AT+DVID") + String(dvid);
+void Jdy40::setDeviceID(uint16_t dvid) {
+  char buffer[13];
+  sprintf(buffer,AT_DVID, dvid);
   startConfig();
-  expect(cmd.c_str(),"OK"); // Wireless ID set to 1020
+  send(buffer); // Wireless ID set to 1020
 }
-void Jdy40::setChannel(const char* chan) {
-  String cmd = String("AT+RFC") + String(chan);
+void Jdy40::setChannel(uint16_t chan) { 
+  char buffer[13];
+  sprintf(buffer,AT_RFC, chan); // 128 channels
   startConfig();
-  expect(cmd.c_str(),"OK"); // Wireless ID set to 1020
+  send(buffer); // Wireless ID set to 1020
 }
 
 uint16_t Jdy40::crc_ccitt (const uint8_t * str, unsigned int length) {
@@ -142,7 +161,7 @@ char * Jdy40::readLine() {
         return inputLine;
       } else {
         if (debugStream != NULL ) {
-          debugStream->print("CRC Error, rejected");
+          debugStream->print(F("CRC Error, rejected"));
           debugStream->println(inputLine);
         }
         // drop the line CRC invalid.
@@ -160,7 +179,7 @@ char * Jdy40::readLine() {
 }
 
 
-int Jdy40::expect(const char *cmd, const char *response) {
+int Jdy40::send(const char *cmd) {
   for(int i = 0; i < 4; i++) {
     delay(500);
     while(jdy40Stream->available()) {
@@ -171,19 +190,19 @@ int Jdy40::expect(const char *cmd, const char *response) {
     delay(100);
     String res = jdy40Stream->readStringUntil('\n');
     res.trim();
-    if ( res.equals(response) ) {
+    if ( res.equals(OK) ) {
       if ( debugStream != NULL ) {
         debugStream->print(cmd);
-        debugStream->println(" OK");
+        debugStream->println(F(" OK"));
       }
       return 1;    
     } 
     if ( debugStream != NULL ) {
-      debugStream->println("Init Failed command:");
+      debugStream->println(F("Init Failed command:"));
       debugStream->println(cmd);
       debugStream->println(res);
       dumpHex(res.c_str());
-      dumpHex(response);
+      dumpHex(OK);
     }
   }
   return 0;
@@ -194,6 +213,6 @@ void Jdy40::dumpHex(const char * str) {
   {
     debugStream->print(str[i], HEX);//excludes NULL byte
   }
-  debugStream->print(":");
+  debugStream->print(F(":"));
   debugStream->println(strlen(str));
 }

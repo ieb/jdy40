@@ -19,15 +19,15 @@ class Jdy40 {
         void init();
         void setBaud(uint16_t baud);
 
-        void setRFID(const char*  rfid);
-        void setDeviceID(const char* dvid);
-        void setChannel(const char* chan);
+        void setRFID(uint16_t  rfid);
+        void setDeviceID(uint16_t dvid);
+        void setChannel(uint16_t chan);
         int16_t checkCRC(const char *inputLine);
 
 
     private:
         void dumpHex(const char * str);
-        int expect(const char *cmd, const char *response);
+        int send(const char *cmd);
         uint16_t crc_ccitt (const uint8_t * str, unsigned int length);
         void setupJDY40();
         Stream * debugStream;

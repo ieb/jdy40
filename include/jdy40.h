@@ -17,17 +17,17 @@ class Jdy40 {
         char *readLine();
         uint16_t writeLine(const char *output);
         void init();
-        void setBaud(uint16_t baud);
+        bool setBaud(uint16_t baud);
 
-        void setRFID(uint16_t  rfid);
-        void setDeviceID(uint16_t dvid);
-        void setChannel(uint16_t chan);
+        bool setRFID(uint16_t  rfid);
+        bool setDeviceID(uint16_t dvid);
+        bool setChannel(uint16_t chan);
         int16_t checkCRC(const char *inputLine);
 
 
     private:
         void dumpHex(const char * str);
-        int send(const char *cmd);
+        bool send(const char *cmd);
         uint16_t crc_ccitt (const uint8_t * str, unsigned int length);
         void setupJDY40();
         Stream * debugStream;

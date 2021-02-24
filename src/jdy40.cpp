@@ -66,36 +66,36 @@ void Jdy40::init() {
 
 
 
-void Jdy40::setBaud(uint16_t baud) {
+bool Jdy40::setBaud(uint16_t baud) {
    startConfig();
    switch(baud) {
-       case 1200: send(AT_BAUD_1200); return;
-       case 2400: send(AT_BAUD_2400); return;
-       case 4800: send(AT_BAUD_4800); return;
-       case 9600: send(AT_BAUD_9600); return;
-       case 14400: send(AT_BAUD_14400); return;
-       case 19200: send(AT_BAUD_19200); return;
-       default: send(AT_BAUD_9600); return;
+       case 1200: return send(AT_BAUD_1200); 
+       case 2400: return send(AT_BAUD_2400); 
+       case 4800: return send(AT_BAUD_4800); 
+       case 9600: return send(AT_BAUD_9600); 
+       case 14400: return send(AT_BAUD_14400); 
+       case 19200: return send(AT_BAUD_19200); 
+       default: return send(AT_BAUD_9600); 
    }
 }
 
-void Jdy40::setRFID(uint16_t  rfid) {
+bool Jdy40::setRFID(uint16_t  rfid) {
   char buffer[13];
   sprintf(buffer,AT_RFID, rfid);
   startConfig();
-  send(buffer); // Wireless ID set to 1020
+  return send(buffer); // Wireless ID set to 1020
 }
-void Jdy40::setDeviceID(uint16_t dvid) {
+bool Jdy40::setDeviceID(uint16_t dvid) {
   char buffer[13];
   sprintf(buffer,AT_DVID, dvid);
   startConfig();
-  send(buffer); // Wireless ID set to 1020
+  return send(buffer); // Wireless ID set to 1020
 }
-void Jdy40::setChannel(uint16_t chan) { 
+bool  Jdy40::setChannel(uint16_t chan) { 
   char buffer[13];
   sprintf(buffer,AT_RFC, chan); // 128 channels
   startConfig();
-  send(buffer); // Wireless ID set to 1020
+  return send(buffer); // Wireless ID set to 1020
 }
 
 
@@ -179,31 +179,29 @@ char * Jdy40::readLine() {
 }
 
 
-int Jdy40::send(const char *cmd) {
+bool Jdy40::send(const char *cmd) {
   if ( debugStream != NULL ) {
     debugStream->print(cmd);
   }
   for(int i = 0; i < 4; i++) {
-    delay(500);
     while(jdy40Stream->available()) {
       jdy40Stream->read();
     }
 
     jdy40Stream->println(cmd);
-    delay(100);
     String res = jdy40Stream->readStringUntil('\n');
     res.trim();
     if ( res.equals(OK) ) {
       if ( debugStream != NULL ) {
         debugStream->println(F(" OK"));
       }
-      return 1;    
+      return true;    
     } 
   }
   if ( debugStream != NULL ) {
     debugStream->println(F(" Failed"));
   }
-  return 0;
+  return false;
 }
 
 void Jdy40::dumpHex(const char * str) {

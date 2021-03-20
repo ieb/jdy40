@@ -50,7 +50,7 @@ void Jdy40::startConfig() {
 
 void Jdy40::endConfig() {
   if ( inConfig ) {
-      digitalWrite(dataEnPin, 0);   
+      digitalWrite(dataEnPin, 1);   
       delay(500);
       inConfig = false;  
   }

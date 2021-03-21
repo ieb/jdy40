@@ -161,11 +161,12 @@ char * Jdy40::readLine() {
         return inputLine;
       } else {
         if (debugStream != NULL ) {
-          debugStream->print(F("CRC Error, rejected"));
+          debugStream->print(F("CRC Error, rejected "));
           debugStream->println(inputLine);
         }
         // drop the line CRC invalid.
         bufferPos = 0;
+        crcErrors++;
         return NULL;
       }
     } else if ( bufferPos < maxLineLength-1 ) {
@@ -177,6 +178,11 @@ char * Jdy40::readLine() {
   }
   return NULL;
 }
+
+uint16_t Jdy40::getCRCErrors() {
+  return crcErrors;
+}
+
 
 
 bool Jdy40::send(const char *cmd) {

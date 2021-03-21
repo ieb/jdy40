@@ -23,6 +23,7 @@ class Jdy40 {
         bool setDeviceID(uint16_t dvid);
         bool setChannel(uint16_t chan);
         int16_t checkCRC(const char *inputLine);
+        uint16_t getCRCErrors();
 
 
     private:
@@ -37,6 +38,7 @@ class Jdy40 {
         bool inConfig;
         uint16_t bufferPos;
         uint16_t maxLineLength;
+        uint16_t crcErrors = 0;
         char *inputLine;
 };
 
